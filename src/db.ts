@@ -92,7 +92,7 @@ export function allPostSummaries(): string{
     return JSON.stringify(result,null,2);
 }
 
-function getPost(postId: number): string{
+export function getPost(postId: number): string{
     let postsQ = db.prepare(`
         select p.postId, p.title, p.summary, p.dateAdded, p.dateModified, p.content
         from posts as p
