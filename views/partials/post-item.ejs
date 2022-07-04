@@ -1,22 +1,21 @@
 <div class="post-item">
-    <a href=" <%= "./p?" + post.postId  %> ">
+    <a class="post-item-title" href=" <%= "./p?" + post.postId  %> ">
         <h2>
             <%= post.title %>
         </h2>
     </a>
-    <p> 
-        date added <%= post.dateAdded %>
-    </p>
-    <div>
-        tags
+    <span class="post-item-date"> 
+         <%= post.dateAdded %>
+    </span>
+    <span class="post-item-taglist">
         <% post.tags.forEach((tag) => { %>
-            <span>
+            <a class="post-taglist-tag" href="<%= `/tag?id=${tag.tagId}` %>">
                 <%= tag.tagName %>
-            </span>
+            </a>
         <% }); %>
-    </div>
+        </span>
 
-    <p>
-        summary <%= post.summary %>
+    <p class="post-item-summary">
+        <%= post.summary %>
     </p> 
 </div>
