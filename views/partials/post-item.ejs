@@ -1,5 +1,5 @@
 <div class="post-item">
-    <a class="post-item-title" href=" <%= "./p?" + post.postId  %> ">
+    <a class="post-item-title" href=" <%= `./post/${post.postId}`  %> ">
         <h2>
             <%= post.title %>
         </h2>
@@ -9,7 +9,7 @@
     </span>
     <span class="post-item-taglist">
         <% post.tags.forEach((tag) => { %>
-            <a class="post-taglist-tag" href="<%= `/tag?id=${tag.tagId}` %>">
+            <a class="post-taglist-tag" href="<%= `/tag/${tag.tagId}` %>">
                 <%= tag.tagName %>
             </a>
         <% }); %>

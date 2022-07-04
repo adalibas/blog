@@ -54,3 +54,8 @@ a:hover {
     margin-left: 2ex;
     color: black;
 }
+
+.post-content {
+    margin: 2ex;
+    background-color: white
+}
