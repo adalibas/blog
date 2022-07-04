@@ -1,0 +1,31 @@
+begin transaction;
+create table admin (
+    adminId integer primary key autoincrement,
+    email text,
+    password text
+);
+create table posts (
+    postId integer primary key autoincrement,
+    title text unique,
+    summary text,
+    dateAdded text default (date()),
+    dateModified text default (date()),
+    content text
+);
+
+create table tags (
+    tagId integer primary key autoincrement,
+    name text unique
+);
+
+create table tag_children (
+    parentId integer references tags(tagId) on delete cascade,
+    childId integer  references tags(tagId) on delete cascade
+);
+
+create table post_tag (
+    postId integer  references posts(postId) on delete cascade,
+    tagId integer  references tags(tagId) on delete cascade
+);
+insert into tags (name) values ("root");
+end transaction;
