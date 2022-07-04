@@ -1,9 +1,10 @@
 import express from 'express';
-import {allPostSummaries} from './db'
+import {allPostSummaries} from './db';
 
 let app = express();
 const port = 3000;
 app.set('view engine', 'ejs')
+app.use(express.static(`${__dirname}/../public`));
 
 app.get('/', (req, res) => {
     let posts = JSON.parse(allPostSummaries());
