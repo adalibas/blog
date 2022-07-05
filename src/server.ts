@@ -6,6 +6,7 @@ const port = 3000;
 app.set('view engine', 'ejs')
 app.use('/', express.static(`${__dirname}/../public`));
 app.use('/admin', express.static(`${__dirname}/../admin`))
+app.use(express.json())
 
 app.get('/', (req, res) => {
     let posts = allPostSummaries();
@@ -28,7 +29,27 @@ app.get("/tag/:id", (req,res)=>{
     let posts = postsWithTag(tagId);
     res.render('pages/tag',{posts,tag})
   }
-  
+})
+
+app.get("/v/tag/:id", (req,res)=>{
+  let id = req.params.id;
+  if (id == 'all'){
+    let tags = allTags();
+    res.send(tags);
+    
+  }
+  else {
+    let tagId = Number(id)
+    let tag = getTagName(tagId)
+    let posts = postsWithTag(tagId);
+    res.send({posts,tag})
+  }
+})
+
+app.post("/v/tag", (req,res) =>{
+  let body = req.body;
+  console.log(req.body);
+  res.send("hello");
 })
 
 app.listen(port, () => {
