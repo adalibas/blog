@@ -2,11 +2,7 @@
 <html lang="en">
 <%- include('../partials/head') %>
 <body>
-    <header>
-        <div class="banner">
-            <a href="/"><h2>A Personal Blog </h2></a>
-        </div>
-    </header>
+    <%- include('../partials/banner') %>
     <main>
         <%- include('../partials/post-item', post)%>
         <div class="post-content"><%- post.content%></div>
