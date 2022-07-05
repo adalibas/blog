@@ -18,6 +18,18 @@ export function createTag({name, parentId} = {name: "", parentId: 1}){
 
 }
 
+export function deleteTag(tagId: number){
+    let deleteQ = db.prepare(`
+    DELETE FROM tags WHERE tagId = @tagId;
+    `).run({tagId})
+}
+
+export function renameTag(tagId:number, newName:string){
+    db.prepare(`UPDATE tags
+    SET name = @newName
+    WHERE tagId = @tagId;`).run({tagId,newName})
+}
+
 function createPost({title, summary, tags, content} = {title: "", summary: "", tags: [1], content: ""}) {
     let post = db.prepare(`
     insert into posts (title, summary, content) values (@title, @summary, @content);`
@@ -157,6 +169,10 @@ export function allTags(){
 // createPost({title: "first phil", summary:"phil 1", tags: [2], content:"phil 1 hello"});
 // createPost({title: "first comp", summary:"comp 1", tags: [2,3], content:"comp1 hello"});
 // createPost({title: "second comp rec", summary:"rec", tags: [3], content:"comp1 rec hello"});
+
+//deleteTag(5);
+
+//renameTag(4,"zonta")
 
 // console.log(allPostSummaries());
 // console.log(getPost(2))

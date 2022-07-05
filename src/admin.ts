@@ -19,18 +19,12 @@ async function manageTags(){
             item.innerHTML = (
             `
             <p>id:${tag.tagId}, name:${tag.name}</p>
-            <form action="/v/tag" method="delete">
-                <button type="submit">delete</button>
-            </form>
-            
             <form action="/v/tag" method="post">
-                <input type="text" name="${tag.tagId}" value="child name"/>
-                <button type=submit>add child</button>
-            </form>
-            
-            <form>
-            <input type="text" value="new name"/>
-            <button type=submit>rename</button>
+                <input type="radio" name="${tag.tagId}" value="delete">delete</input>
+                <input type="radio" name="${tag.tagId}" value="rename">rename</input>
+                <input type="radio" name="${tag.tagId}" value="add child">add child</input>
+                <input type="text" name="${tag.tagId}" value="child name / new name"/>
+                <button type=submit>submit</button>
             </form>
             `
             );

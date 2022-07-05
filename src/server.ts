@@ -1,5 +1,5 @@
 import express from 'express';
-import {allPostSummaries, getPost, postsWithTag, getTagName, allTags, createTag} from './db';
+import {allPostSummaries, getPost, postsWithTag, getTagName, allTags, createTag, deleteTag, renameTag} from './db';
 
 let app = express();
 const port = 3000;
@@ -50,11 +50,20 @@ app.get("/v/tag/:id", (req,res)=>{
 app.post("/v/tag", (req,res) =>{
   let body = req.body;
   let tagId = Object.keys(body)[0]
-  let name = body[tagId];
-  createTag({name, parentId: Number(tagId)});
-  res.send("new tag added");
+  let [command,name] = body[tagId];
+  
+  if (command === `add child`) {
+    createTag({name, parentId: Number(tagId)})
+    res.send(`new tag:  ${name}   is added`);
+  } else if (command ===`delete`){
+    deleteTag(Number(tagId));
+    res.send(`tagId:${tagId} is deleted`);
+  }
+  else if(command === `rename`){
+    renameTag(Number(tagId), name);
+    res.send(`tag${tagId} is renamed to ${name}`)
+  }  
 })
-
 
 app.listen(port, () => {
   console.log(`app is listening on port ${port}`)
