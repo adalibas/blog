@@ -4,7 +4,10 @@
 <body>
     <%- include('../partials/banner') %>
     <main>
-        <div class="active-post"> Category: <a href="", class="post-taglist-tag"><%- name %></a>  </div>
+        <div class="active-post"> Category: <a href="", class="post-taglist-tag"><%- tag.name %></a>  </div>
+        <div>
+            <a href="/tag/all">See all categories</a>
+        </div>
         <div class="post-list">
             <% posts.forEach((post) => { %>
                 <%- include('../partials/post-item', {post}) %>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+ <%- include('../partials/head')%>
+<body>
+    <%- include('../partials/banner')%>
+    <ul>
+        <% tags.forEach((tag)=> { %>
+            <li>
+                <a href="/tag/<%= tag.tagId %>"><%= tag.name %></a>
+            </li>
+            
+        <% }) %>
+    </ul>
+</body>
+</html>

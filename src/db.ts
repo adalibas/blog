@@ -142,6 +142,11 @@ export function getTagName(tagId: number){
     return db.prepare(`select name
     from tags
     where tagId = @tagId;`).get({tagId})
+}
+
+export function allTags(){
+    return db.prepare(`select tagId, name
+    from tags`).all();
 
 }
 
@@ -157,3 +162,4 @@ export function getTagName(tagId: number){
 // console.log(getPost(2))
 // console.log(postsWithTag(2))
 // console.log(getTagName(2))
+// console.log(allTags());

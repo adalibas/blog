@@ -1,5 +1,5 @@
 import express from 'express';
-import {allPostSummaries, getPost, postsWithTag, getTagName} from './db';
+import {allPostSummaries, getPost, postsWithTag, getTagName,allTags} from './db';
 
 let app = express();
 const port = 3000;
@@ -16,10 +16,19 @@ app.get('/post/:id', (req,res)=>{
   res.render('pages/post',{post})
 })
 app.get("/tag/:id", (req,res)=>{
-  let tagId = Number(req.params.id);
-  let name = getTagName(tagId)
-  let posts = postsWithTag(tagId);
-  res.render('pages/tag',{posts,...name})
+  let id = req.params.id;
+
+  if (id == 'all'){
+    let tags = allTags();
+    res.render('pages/alltags',{tags})
+  }
+  else {
+    let tagId = Number(id)
+    let tag = getTagName(tagId)
+    let posts = postsWithTag(tagId);
+    res.render('pages/tag',{posts,tag})
+  }
+  
 })
 
 app.listen(port, () => {
