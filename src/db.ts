@@ -4,7 +4,7 @@ import {checkCreateDatabase} from './checkfile';
 checkCreateDatabase();
 let db = new Database("./blog.db",{fileMustExist: true});
 
-function createTag({name, parentId} = {name: "", parentId: 1}){
+export function createTag({name, parentId} = {name: "", parentId: 1}){
     let tag = db.prepare(
         "insert into tags (name) values (?);");
     

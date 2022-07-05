@@ -4,9 +4,8 @@ async function manageTags(){
         name: string
     }
     
-    let panel = document.getElementById("admin-panel")!;
-
-    if (panel.className === 'tags'){
+    let panel = document.getElementById("admin-panel");
+    if (panel == null || panel.className === 'tags') {
         return;
     } else {
         panel.className = 'tags';
@@ -20,18 +19,24 @@ async function manageTags(){
             item.innerHTML = (
             `
             <p>id:${tag.tagId}, name:${tag.name}</p>
-            <input type="button">delete</input>
-            <div>
-            <input type="text">add child</input>
-            </div>
-            <div>
-            <input type="text">rename</input>
-            </div>
+            <form action="/v/tag" method="delete">
+                <button type="submit">delete</button>
+            </form>
+            
+            <form action="/v/tag" method="post">
+                <input type="text" name="${tag.tagId}" value="child name"/>
+                <button type=submit>add child</button>
+            </form>
+            
+            <form>
+            <input type="text" value="new name"/>
+            <button type=submit>rename</button>
+            </form>
             `
             );
             list.appendChild(item);
         })
-        panel?.appendChild(list)
+        panel.appendChild(list)
     }
 }
 
