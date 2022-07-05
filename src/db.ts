@@ -54,7 +54,7 @@ interface PostWithTag extends Post{
     tags: Tag[]
 }
 
-export function allPostSummaries(): string{
+export function allPostSummaries() {
     let postsQ = db.prepare(`
         select p.postId, p.title, p.summary, p.dateAdded
         from posts as p
@@ -89,10 +89,10 @@ export function allPostSummaries(): string{
 
     }
 
-    return JSON.stringify(result,null,2);
+    return result;
 }
 
-export function getPost(postId: number): string{
+export function getPost(postId: number) {
     let postsQ = db.prepare(`
         select p.postId, p.title, p.summary, p.dateAdded, p.dateModified, p.content
         from posts as p
@@ -122,7 +122,27 @@ export function getPost(postId: number): string{
     let result = post as PostWithTag;
     result["tags"] = map[postId]
 
-    return JSON.stringify(result,null,2);
+    return result;
+}
+
+export function postsWithTag(tagId: number){
+    let postsQ = db.prepare(`select p.postId 
+    from (posts as p left join post_tag as pt on p.postId = pt.postId)
+    left join tags as t on pt.tagId = t.tagId
+    where t.tagId == @tagId`);
+
+    let postIds = postsQ.all({tagId})
+    let posts = postIds.map((elem)=>{
+       return getPost(Number(elem.postId));
+    })
+    return posts;
+}
+
+export function getTagName(tagId: number){
+    return db.prepare(`select name
+    from tags
+    where tagId = @tagId;`).get({tagId})
+
 }
 
 // createTag({name:"phil",parentId:1})
@@ -135,3 +155,5 @@ export function getPost(postId: number): string{
 
 // console.log(allPostSummaries());
 // console.log(getPost(2))
+// console.log(postsWithTag(2))
+// console.log(getTagName(2))
