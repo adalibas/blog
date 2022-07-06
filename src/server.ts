@@ -1,6 +1,6 @@
 import express from 'express';
 import fileUpload from 'express-fileupload'
-import {allPostSummaries, getPost, postsWithTag, getTagName, allTags, createTag, deleteTag, renameTag} from './db';
+import {allPostSummaries, getPost, postsWithTag, getTagName, allTags, createTag, deleteTag, renameTag, createPost, deletePost} from './db';
 
 let app = express();
 const port = 3000;
@@ -76,15 +76,30 @@ app.get("/v/post/:id", (req,res)=>{
   }
 })
 
+app.delete("/v/post/:id", (req,res)=>{
+  let id = req.params.id;
+  deletePost(Number(id));
+})
+
 app.post("/v/post", (req,res)=>{
   let body = req.body;
-  console.debug("body:         ",body);
+  let {command,title,summary,tags} = body;
+  let tagArray = tags.split(",").map(Number)
   let files = req.files!;
-  console.debug("files:           ",files)
-  let content = files.content as any;
-  let text = content.data.toString()
-  console.log(content);
-  console.log(text);
+  let buff = files.content as any;
+  let content = buff.data.toString();
+
+  try{
+    createPost({title,summary,content,tags:tagArray})
+  }
+
+  catch (e){
+    console.log(e);
+    res.send(`error creating the post`);
+  }
+  
+  res.send(`New post ${title} is created`);
+
 })
 
 app.listen(port, () => {

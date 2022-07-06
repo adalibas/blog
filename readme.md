@@ -2,6 +2,10 @@
 
 Tag names unique or if have different parent it can be duplicate?
 
+## to do
+
+* solve create tag admin page promise problem
+
 join solution
 
 db.prepare(`

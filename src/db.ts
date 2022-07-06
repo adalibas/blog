@@ -30,7 +30,7 @@ export function renameTag(tagId:number, newName:string){
     WHERE tagId = @tagId;`).run({tagId,newName})
 }
 
-function createPost({title, summary, tags, content} = {title: "", summary: "", tags: [1], content: ""}) {
+export function createPost({title, summary, tags, content} = {title: "", summary: "", tags: [1], content: ""}) {
     let post = db.prepare(`
     insert into posts (title, summary, content) values (@title, @summary, @content);`
     )
@@ -43,6 +43,12 @@ function createPost({title, summary, tags, content} = {title: "", summary: "", t
     for (let tagId of tags){
         post_tag.run({postId: pid, tagId})
     }
+}
+
+export function deletePost(id:number){
+    db.prepare(`
+        DELETE FROM posts WHERE postId = @postId;
+    `).run({postId: id})
 }
 
 interface Post {
@@ -173,6 +179,8 @@ export function allTags(){
 //deleteTag(5);
 
 //renameTag(4,"zonta")
+
+//deletePost(7)
 
 // console.log(allPostSummaries());
 // console.log(getPost(2))

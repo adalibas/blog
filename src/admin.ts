@@ -58,13 +58,45 @@ async function managePosts() {
         
         if (action == "delete"){
             fetch("/v/post/all").then((e)=>e.json()).then((posts)=>{
+                let panel = document.getElementById("admin-panel")!;
+                
+                let select_div = document.createElement('div');
+                select_div.innerHTML = `
+                    <form id="delete-form">
+                        <label for="posts">Post</label>
+                        <select name="posts" id="posts-select">
+                        </select>
+                        <button type="submit">Delete</button>
+                    </form>`
+
+                panel.appendChild(select_div);
+
                 posts.forEach((post: { postId: any; title: any; })=>{
                     let id = post.postId;
                     let title = post.title;
-                    let zonta = document.createElement("p")
-                    zonta.innerHTML = `${id},${title}`
-                    document.getElementById("admin-panel")?.appendChild(zonta);
+
+                    console.log(`in for each`)
+
+                    let option = document.createElement("option")
+                    option.value = id;
+                    option.innerText = `${title}`
+                    document.getElementById("posts-select")?.appendChild(option);
                 })
+
+                let form = document.getElementById("delete-form")
+                form?.addEventListener("submit", (e)=>{
+                    e.preventDefault();
+                    let data = new FormData(e.target as HTMLFormElement)
+                    let postId = data.get('posts');
+
+                    fetch(`/v/post/${postId}`,{method:"DELETE"}).catch(e=> {
+                        console.log(`fetch error for post delete`)
+                        console.log(e);
+                    })
+                })
+
+
+                
             })
         } else if (action == "new-post"){
             let panel = document.getElementById("admin-panel")!;
@@ -72,10 +104,30 @@ async function managePosts() {
             form.innerHTML = `
                 <form id="newPostForm">
                 <input type="hidden" name="command" value="newpost">
-                <input type="text" name="title" id="post-title">
-                <input type="file" name="content" id="post-content">
-                <input type="text" name="tags" id="post-tags">
-                <button type="submit" id="newPostSubmit">submit</button>
+                <div>
+                    <label for="post-title">Title</label> 
+                    <input type="text" name="title" id="post-title">
+                </div>
+                
+                <div>
+                    <label for="post-summary">Summary</label>
+                    <textarea name="summary" id="post-summary"></textarea>
+                </div>
+                
+                <div>
+                    <label for="post-content">File</label>
+                    <input type="file" name="content" id="post-content">
+                </div>
+                
+                <div>
+                    <label for="post-tags">Taglist</label>
+                    <input type="text" name="tags" id="post-tags">
+                </div>
+                
+                <div>
+                    <button type="submit" id="newPostSubmit">submit</button>
+                </div>
+                
                 </form>
             `
             panel.appendChild(form);
@@ -86,6 +138,12 @@ async function managePosts() {
 
                 let data = new FormData(e.target as HTMLFormElement);
                 fetch("/v/post",{method:"POST", body: data})
+                    .then(res =>{
+                        let result = document.createElement('p');
+                        result.innerHTML = `${res.body}`
+                        let newPostForm = document.getElementById("newPostForm")!;
+                        newPostForm.appendChild(result);
+                    });
             })
 
             
