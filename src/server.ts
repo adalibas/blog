@@ -1,4 +1,5 @@
 import express from 'express';
+import fileUpload from 'express-fileupload'
 import {allPostSummaries, getPost, postsWithTag, getTagName, allTags, createTag, deleteTag, renameTag} from './db';
 
 let app = express();
@@ -8,6 +9,7 @@ app.use('/', express.static(`${__dirname}/../public`));
 app.use('/admin', express.static(`${__dirname}/../admin`))
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
+app.use(fileUpload())
 
 app.get('/', (req, res) => {
     let posts = allPostSummaries();
@@ -63,6 +65,26 @@ app.post("/v/tag", (req,res) =>{
     renameTag(Number(tagId), name);
     res.send(`tag${tagId} is renamed to ${name}`)
   }  
+})
+
+app.get("/v/post/:id", (req,res)=>{
+  let id = req.params.id;
+  if(id == "all"){
+    res.send(allPostSummaries());
+  } else {
+    res.send(getPost(Number(id)));
+  }
+})
+
+app.post("/v/post", (req,res)=>{
+  let body = req.body;
+  console.debug("body:         ",body);
+  let files = req.files!;
+  console.debug("files:           ",files)
+  let content = files.content as any;
+  let text = content.data.toString()
+  console.log(content);
+  console.log(text);
 })
 
 app.listen(port, () => {
