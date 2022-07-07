@@ -10,28 +10,137 @@ async function manageTags(){
     } else {
         panel.className = 'tags';
         panel.innerHTML = "";
-        let f = await fetch("/v/tag/all");
-        let tags = await f.json() as unknown as tagList [];
 
-        let list = document.createElement("ul");
-        tags.forEach((tag)=>{
-            let item = document.createElement("li");
-            item.innerHTML = (
-            `
-            <p>id:${tag.tagId}, name:${tag.name}</p>
-            <form action="/v/tag" method="post">
-                <input type="radio" name="${tag.tagId}" value="delete">delete</input>
-                <input type="radio" name="${tag.tagId}" value="rename">rename</input>
-                <input type="radio" name="${tag.tagId}" value="add child">add child</input>
-                <input type="text" name="${tag.tagId}" value="child name / new name"/>
-                <button type=submit>submit</button>
-            </form>
-            `
-            );
-            list.appendChild(item);
-        })
-        panel.appendChild(list)
-    }
+        let form = document.createElement("form");
+        form.innerHTML = `
+            <div>
+                <label for="delete-tag">Delete tag</label>
+                <input type="radio" name="tag-action" id="delete-tag" value="delete-tag">
+            </div>
+        
+            <div>
+                <label for="new-post">New tag</label>
+                <input type="radio" name="tag-action" id="new-tag" value="new-tag">
+            </div>
+
+            <div>
+                <label for="rename-tag">Rename tag</label>
+                <input type="radio" name="tag-action" id="rename-tag" value="rename-tag">
+            </div>
+
+            <button type="submit">submit</button>`
+
+        panel.appendChild(form);
+        
+        form.addEventListener("submit",async (e)=>{
+            e.preventDefault();
+            let form = e.target as any
+            let action = form["tag-action"].value
+            
+            if (action == "delete-tag"){
+                let panel = document.getElementById("admin-panel");
+                let selectionDiv = document.createElement("div");
+                selectionDiv.innerHTML = `
+                    <form id="tag-delete-form">
+                        <label for="tags">Tags</label>
+                        <select name="tags" id="tags-select">
+                        </select>
+                        <button id="delete-submit" type="submit">Delete</button>
+                    </form>`;
+                    panel?.appendChild(selectionDiv)
+
+                    let tags = await fetch("/v/tag/all").then(e=>e.json());
+                    tags.forEach((tag:tagList)=>{
+                        let option = document.createElement("option");
+                        option.value = tag.tagId;
+                        option.innerText = tag.name;
+                        let select = document.getElementById("tags-select");
+                        select?.appendChild(option);
+                    })
+
+                    let form = document.getElementById("tag-delete-form");
+                    form?.addEventListener("submit",e=>{
+                        e.preventDefault();
+                        let form = e.target as any;
+                        let data = new FormData(form);
+                        let tagId = data.get("tags")
+                        fetch(`/v/tag/${tagId}`,{method: "DELETE"}).catch(console.log)
+                    })
+                    
+            } else if (action == "new-tag"){
+                let panel = document.getElementById("admin-panel");
+                let selectionDiv = document.createElement("div");
+                selectionDiv.innerHTML = `
+                    <form id="tag-new-form">
+                        <label for="tags">Parent tag</label>
+                        <select name="tags" id="tags-select">
+                        </select>
+                        <label for="new-tag-text">New tag name</label>
+                        <input type="text" id="new-tag-text" name="new-name"></input>
+                        <button id="new-tag-submit" type="submit">New tag</button>
+                    </form>`;
+                    panel?.appendChild(selectionDiv)
+
+                    let tags = await fetch("/v/tag/all").then(e=>e.json());
+                    tags.forEach((tag:tagList)=>{
+                        let option = document.createElement("option");
+                        option.value = tag.tagId;
+                        option.innerText = tag.name;
+                        let select = document.getElementById("tags-select");
+                        select?.appendChild(option);
+                    })
+
+                    let form = document.getElementById("tag-new-form");
+                    form?.addEventListener("submit",e=>{
+                        e.preventDefault();
+                        let form = e.target as any;
+                        let data = new FormData(form);
+                        let tagId = data.get("tags");
+                        let newName = data.get("new-name");
+                        let obj = {newName}
+
+                        fetch(`/v/tag/${tagId}`,{method: "POST", body: JSON.stringify(obj), headers: {"Content-Type": 'application/json'}})
+                        
+                    })
+
+            } else if (action == "rename-tag"){
+                let panel = document.getElementById("admin-panel");
+                let selectionDiv = document.createElement("div");
+                selectionDiv.innerHTML = `
+                    <form id="tag-rename-form">
+                        <label for="tags">Rename tag</label>
+                        <select name="tags" id="tags-select">
+                        </select>
+                        <label for="new-name-text">New name</label>
+                        <input type="text" id="new-tag-text" name="new-name"></input>
+                        <button id="rename-submit" type="submit">Submit</button>
+                    </form>`;
+                    panel?.appendChild(selectionDiv)
+
+                    let tags = await fetch("/v/tag/all").then(e=>e.json());
+                    tags.forEach((tag:tagList)=>{
+                        let option = document.createElement("option");
+                        option.value = tag.tagId;
+                        option.innerText = tag.name;
+                        let select = document.getElementById("tags-select");
+                        select?.appendChild(option);
+                    })
+
+                    let form = document.getElementById("tag-rename-form");
+                    form?.addEventListener("submit",e=>{
+                        e.preventDefault();
+                        let form = e.target as any;
+                        let data = new FormData(form);
+                        let tagId = data.get("tags");
+                        let newName = data.get("new-name");
+                        let obj = {newName}
+
+                        fetch(`/v/tag/${tagId}`,{method: "PUT", body: JSON.stringify(obj), headers: {"Content-Type": 'application/json'}})
+                    })
+
+        }
+    })
+}
 }
 
 async function managePosts() {
@@ -42,7 +151,7 @@ async function managePosts() {
         panel.className = 'posts';
         panel.innerHTML = `<form id="post-action-form" action="">
         <div>
-            <label for="delete">delete</label>
+            <label for="delete">Delete post</label>
             <input type="radio" name="post-action" id="delete" value="delete">
         </div>
         
@@ -83,8 +192,6 @@ async function managePosts() {
                 posts.forEach((post: { postId: any; title: any; })=>{
                     let id = post.postId;
                     let title = post.title;
-
-                    console.log(`in for each`)
 
                     let option = document.createElement("option")
                     option.value = id;
