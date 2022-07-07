@@ -41,12 +41,21 @@ async function managePosts() {
     } else {
         panel.className = 'posts';
         panel.innerHTML = `<form id="post-action-form" action="">
-        <label for="delete">delete</label>
-        <input type="radio" name="post-action" id="delete" value="delete">
-        <label for="new-post">New post</label>
-        <input type="radio" name="post-action" id="new-post" value="new-post">
-        <label for="update-post">Update post</label>
-        <input type="radio" name="post-action" id="update-post" value="update-post">
+        <div>
+            <label for="delete">delete</label>
+            <input type="radio" name="post-action" id="delete" value="delete">
+        </div>
+        
+        <div>
+            <label for="new-post">New post</label>
+            <input type="radio" name="post-action" id="new-post" value="new-post">
+        </div>
+
+        <div>
+            <label for="update-post">Update post</label>
+            <input type="radio" name="post-action" id="update-post" value="update-post">
+        </div>
+
         <button type="submit">submit</button>
     </form>`;
 

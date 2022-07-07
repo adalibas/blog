@@ -13,9 +13,9 @@ body {
     background-color: rgb(250, 250, 250) ;
 }
 
-main {
+/* main {
     
-}
+} */
 
 .banner {
     text-align: center;
@@ -32,6 +32,7 @@ a:hover {
 .post-item {
     background-color: white;
     margin: 2ex;
+    box-shadow: -1px 0px 3px;
 }
 .post-item-title h2 {
     color: rgb(23, 23, 80);
