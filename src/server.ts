@@ -49,22 +49,25 @@ app.get("/v/tag/:id", (req,res)=>{
   }
 })
 
-app.post("/v/tag", (req,res) =>{
-  let body = req.body;
-  let tagId = Object.keys(body)[0]
-  let [command,name] = body[tagId];
-  
-  if (command === `add child`) {
-    createTag({name, parentId: Number(tagId)})
-    res.send(`new tag:  ${name}   is added`);
-  } else if (command ===`delete`){
-    deleteTag(Number(tagId));
-    res.send(`tagId:${tagId} is deleted`);
-  }
-  else if(command === `rename`){
-    renameTag(Number(tagId), name);
-    res.send(`tag${tagId} is renamed to ${name}`)
-  }  
+app.put("/v/tag/:id", (req,res) =>{
+  let id = Number(req.params.id)
+  let newName = req.body.newName;
+  renameTag(id, newName)
+  res.send(`renamed tagId ${id} as ${newName}`)
+})
+
+app.post("/v/tag/:id",(req,res)=>{
+  let parentId = Number(req.params.id);
+  let name = req.body.newName;
+  createTag({name, parentId})
+  res.send(`new tag:  ${name}   is added`);
+
+})
+
+app.delete("/v/tag/:id",(req,res) => {
+  let tagId = req.params.id;
+  deleteTag(Number(tagId));
+  res.send(`tagId:${tagId} is deleted`);
 })
 
 app.get("/v/post/:id", (req,res)=>{
