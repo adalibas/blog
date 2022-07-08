@@ -51,6 +51,44 @@ export function deletePost(id:number){
     `).run({postId: id})
 }
 
+export function updatePostTitle(postId:number, newTitle: string){
+    db.prepare(`
+        UPDATE posts
+        SET title = @newTitle
+        WHERE postId = @postId;
+        `).run({postId,newTitle})
+}
+
+export function updatePostSummary(postId:number, newSummary:string){
+    db.prepare(`
+        UPDATE posts
+        SET summary = @newSummary
+        WHERE postId = @postId;
+    `).run({postId,newSummary})
+}
+
+export function updatePostContent(postId:number, newContent:string){
+    db.prepare(`
+        UPDATE posts
+        SET content = @newContent
+        WHERE postId = @postId;
+    `).run({postId,newContent})
+}
+
+export function removeTagFromPost(postId: number, tagId: number){
+    db.prepare(`
+        DELETE from post_tag
+        WHERE postId = @postId AND tagId = @tagId;
+    `).run({postId,tagId})
+}
+
+export function addTagToPost(postId:number, tagId:number){
+    db.prepare(`
+        INSERT INTO post_tag (postId, tagId)
+        VALUES (@postId, @tagId)
+    `).run({postId,tagId})
+}
+
 interface Post {
     postId: number,
     title: string,
@@ -181,6 +219,16 @@ export function allTags(){
 //renameTag(4,"zonta")
 
 //deletePost(7)
+
+//updatePostTitle(8,"love")
+
+// updatePostSummary(8,"updated summary")
+
+//updatePostContent(8,"updated content")
+
+// removeTagFromPost(2,3)
+
+// addTagToPost(4,1)
 
 // console.log(allPostSummaries());
 // console.log(getPost(2))

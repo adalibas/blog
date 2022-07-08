@@ -1,6 +1,9 @@
 import express from 'express';
 import fileUpload from 'express-fileupload'
-import {allPostSummaries, getPost, postsWithTag, getTagName, allTags, createTag, deleteTag, renameTag, createPost, deletePost} from './db';
+import {allPostSummaries, getPost, postsWithTag, getTagName,
+   allTags, createTag, deleteTag, renameTag,
+  createPost, deletePost, updatePostTitle,
+  updatePostSummary, addTagToPost,removeTagFromPost, updatePostContent} from './db';
 
 let app = express();
 const port = 3000;
@@ -82,6 +85,7 @@ app.get("/v/post/:id", (req,res)=>{
 app.delete("/v/post/:id", (req,res)=>{
   let id = req.params.id;
   deletePost(Number(id));
+  res.send(`post id ${id} is deleted`)
 })
 
 app.post("/v/post", (req,res)=>{
@@ -103,6 +107,34 @@ app.post("/v/post", (req,res)=>{
   
   res.send(`New post ${title} is created`);
 
+})
+
+app.put("/v/post/:id", (req,res)=>{
+  let postId = Number(req.params.id);
+  let command = req.body.command;
+  if (command == "change-title"){
+    let newTitle = req.body.newTitle;
+    updatePostTitle(postId, newTitle);
+    res.send(`post ${postId} title is updated`)
+  } else if (command == "change-summary"){
+    let newSummary = req.body.newSummary;
+    updatePostSummary(postId,newSummary);
+    res.send(`post ${postId} summary is updated`)
+  } else if (command == "tag-add") {
+    let newTagId = Number(req.body.newTags);
+    addTagToPost(postId, newTagId);
+    res.send(`post ${postId} tag is added`)
+  } else if (command == "tag-remove") {
+    let tagId = Number(req.body.newTags);
+    removeTagFromPost(postId,tagId);
+    res.send(`post ${postId} tag is removed`)
+  } else if (command == "change-content") {
+    let newFile = req.files?.newFile! as any;
+    let newContent = newFile.data.toString();
+    updatePostContent(postId,newContent);
+    res.send(`post ${postId} content is updated`)
+  }
+  
 })
 
 app.listen(port, () => {

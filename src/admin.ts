@@ -65,6 +65,12 @@ async function manageTags(){
                         let data = new FormData(form);
                         let tagId = data.get("tags")
                         fetch(`/v/tag/${tagId}`,{method: "DELETE"}).catch(console.log)
+                        .then(res => res?.text())
+                        .then(text=>{
+                            let panel = document.getElementById("admin-panel")!;
+                            panel.className = "result"
+                            panel.innerHTML = `<p class="result-text">${text}</p>`
+                        })
                     })
                     
             } else if (action == "new-tag"){
@@ -100,7 +106,12 @@ async function manageTags(){
                         let obj = {newName}
 
                         fetch(`/v/tag/${tagId}`,{method: "POST", body: JSON.stringify(obj), headers: {"Content-Type": 'application/json'}})
-                        
+                        .then(res => res?.text())
+                        .then(text=>{
+                            let panel = document.getElementById("admin-panel")!;
+                            panel.className = "result"
+                            panel.innerHTML = `<p class="result-text">${text}</p>`
+                        })
                     })
 
             } else if (action == "rename-tag"){
@@ -136,6 +147,12 @@ async function manageTags(){
                         let obj = {newName}
 
                         fetch(`/v/tag/${tagId}`,{method: "PUT", body: JSON.stringify(obj), headers: {"Content-Type": 'application/json'}})
+                        .then(res => res?.text())
+                        .then(text=>{
+                            let panel = document.getElementById("admin-panel")!;
+                            panel.className = "result"
+                            panel.innerHTML = `<p class="result-text">${text}</p>`
+                        })
                     })
 
         }
@@ -166,38 +183,38 @@ async function managePosts() {
         </div>
 
         <button type="submit">submit</button>
-    </form>`;
+        </form>`;
 
-    let form = document.getElementById("post-action-form");
-    form?.addEventListener('submit',(e)=>{
-        e.preventDefault();
-        let form = e.target as any
-        let action = form["post-action"].value
+        let form = document.getElementById("post-action-form");
+        form?.addEventListener('submit',(e)=>{
+            e.preventDefault();
+            let form = e.target as any
+            let action = form["post-action"].value
         
-        if (action == "delete"){
-            fetch("/v/post/all").then((e)=>e.json()).then((posts)=>{
-                let panel = document.getElementById("admin-panel")!;
-                
-                let select_div = document.createElement('div');
-                select_div.innerHTML = `
-                    <form id="delete-form">
-                        <label for="posts">Post</label>
-                        <select name="posts" id="posts-select">
-                        </select>
-                        <button type="submit">Delete</button>
-                    </form>`
+            if (action == "delete"){
+                fetch("/v/post/all").then((e)=>e.json()).then((posts)=>{
+                    let panel = document.getElementById("admin-panel")!;
 
-                panel.appendChild(select_div);
+                    let select_div = document.createElement('div');
+                    select_div.innerHTML = `
+                        <form id="delete-form">
+                            <label for="posts">Post</label>
+                            <select name="posts" id="posts-select">
+                            </select>
+                            <button type="submit">Delete</button>
+                        </form>`
 
-                posts.forEach((post: { postId: any; title: any; })=>{
-                    let id = post.postId;
-                    let title = post.title;
+                    panel.appendChild(select_div);
 
-                    let option = document.createElement("option")
-                    option.value = id;
-                    option.innerText = `${title}`
-                    document.getElementById("posts-select")?.appendChild(option);
-                })
+                    posts.forEach((post: { postId: any; title: any; })=>{
+                        let id = post.postId;
+                        let title = post.title;
+
+                        let option = document.createElement("option")
+                        option.value = id;
+                        option.innerText = `${title}`
+                        document.getElementById("posts-select")?.appendChild(option);
+                    })
 
                 let form = document.getElementById("delete-form")
                 form?.addEventListener("submit", (e)=>{
@@ -208,6 +225,12 @@ async function managePosts() {
                     fetch(`/v/post/${postId}`,{method:"DELETE"}).catch(e=> {
                         console.log(`fetch error for post delete`)
                         console.log(e);
+                    })
+                    .then(res => res?.text())
+                    .then(text=>{
+                        let panel = document.getElementById("admin-panel")!;
+                        panel.className = "result"
+                        panel.innerHTML = `<p class="result-text">${text}</p>`
                     })
                 })
 
@@ -254,24 +277,149 @@ async function managePosts() {
 
                 let data = new FormData(e.target as HTMLFormElement);
                 fetch("/v/post",{method:"POST", body: data})
-                    .then(res =>{
-                        let result = document.createElement('p');
-                        result.innerHTML = `${res.body}`
-                        let newPostForm = document.getElementById("newPostForm")!;
-                        newPostForm.appendChild(result);
-                    });
+                .then(res => res?.text())
+                        .then(text=>{
+                            let panel = document.getElementById("admin-panel")!;
+                            panel.className = "result"
+                            panel.innerHTML = `<p class="result-text">${text}</p>`
+                        })
             })
 
             
 
         } else if (action == "update-post"){
+            fetch("/v/post/all").then((e)=>e.json()).then((posts)=>{
+                let panel = document.getElementById("admin-panel")!;
+                
+                let select_div = document.createElement('div');
+                select_div.innerHTML = `
+                    <form id="update-form">
+                        <label for="posts">Post</label>
+                        <select name="posts" id="posts-select">
+                        </select>
+                    </form>`
 
-        }
-        
-    } )
+                panel.appendChild(select_div);
 
-        
-    }
+                posts.forEach((post: { postId: any; title: any; })=>{
+                    let id = post.postId;
+                    let title = post.title;
+
+                    let option = document.createElement("option")
+                    option.value = id;
+                    option.innerText = `${title}`
+                    document.getElementById("posts-select")?.appendChild(option);
+                })
+            }).then(e =>{
+                let updateForm = document.getElementById("update-form")!;
+                let form = document.createElement("div")
+                form.innerHTML = `
+                    
+                    <div>
+                        <label for="post-title">Title</label> 
+                        <input type="text" name="title" id="post-title">
+                        <button type="button" id="title-submit">change title</button>
+                    </div>
+                    
+
+                    <div>
+                        <label for="post-summary">Summary</label>
+                        <textarea name="summary" id="post-summary"></textarea>
+                        <button type="button" id="summary-submit">change summary</button>
+                    </div>
+
+
+
+                    <div>
+                        <label for="post-tags">Taglist</label>
+                        <input type="text" name="tags" id="post-tags">
+                        <button type="button" id="tag-add">Add tag</button>
+                        <button type="button" id="tag-remove">Remove tag</button>
+                    </div>
+
+                
+
+                    <div>
+                       <label for="post-content">File</label>
+                       <input type="file" name="content" id="post-content">
+                       <button type="button" id="content-submit">change content</button>
+                    </div>
+                `
+                updateForm.appendChild(form);
+
+                let newPostForm = document.getElementById("update-form")!
+                newPostForm.addEventListener("click",(e)=>{
+                    
+                    let target = e.target as HTMLElement;
+                    let id = target.getAttribute("id");
+                    let data = new FormData(document.getElementById("update-form") as HTMLFormElement);
+                    let postId = data.get("posts");
+                    if (id == "title-submit"){
+                        e.preventDefault();
+                        let title = data.get("title");
+                        let send = {command:"change-title", newTitle: title};
+                        fetch(`/v/post/${postId}`,{method: "PUT", body:JSON.stringify(send), headers:{"Content-type": "application/json"}})
+                        .then(res => res?.text())
+                        .then(text=>{
+                            let panel = document.getElementById("admin-panel")!;
+                            panel.className = "result"
+                            panel.innerHTML = `<p class="result-text">${text}</p>`
+                        })
+                        
+
+                    } else if (id == "summary-submit") {
+                        e.preventDefault();
+                        let summary = data.get("summary");
+                        let send = {command:"change-summary", newSummary: summary}
+                        fetch(`/v/post/${postId}`,{method: "PUT", body:JSON.stringify(send), headers:{"Content-type": "application/json"}})
+                        .then(res => res?.text())
+                        .then(text=>{
+                            let panel = document.getElementById("admin-panel")!;
+                            panel.className = "result"
+                            panel.innerHTML = `<p class="result-text">${text}</p>`
+                        })
+                    } else if (id == "content-submit"){
+                        e.preventDefault();
+                        let file = data.get("content")!;
+                        let submit = new FormData();
+                        submit.append("newFile",file);
+                        submit.append("command", "change-content")
+                        fetch(`/v/post/${postId}`,{method: "PUT", body:submit})
+                        .then(res => res?.text())
+                        .then(text=>{
+                            let panel = document.getElementById("admin-panel")!;
+                            panel.className = "result"
+                            panel.innerHTML = `<p class="result-text">${text}</p>`
+                        })
+                    } else if (id == "tag-add"){
+                        e.preventDefault();
+                        let tags = data.get("tags");
+                        let send = {command:"tag-add", newTags: tags};
+                        fetch(`/v/post/${postId}`,{method: "PUT", body:JSON.stringify(send), headers:{"Content-type": "application/json"}})
+                        .then(res => res?.text())
+                        .then(text=>{
+                            let panel = document.getElementById("admin-panel")!;
+                            panel.className = "result"
+                            panel.innerHTML = `<p class="result-text">${text}</p>`
+                        })
+                    }
+                    else if (id == "tag-remove"){
+                        e.preventDefault();
+                        let tags = data.get("tags");
+                        let send = {command:"tag-remove", newTags: tags};
+                        fetch(`/v/post/${postId}`,{method: "PUT", body:JSON.stringify(send), headers:{"Content-type": "application/json"}})
+                        .then(res => res?.text())
+                        .then(text=>{
+                            let panel = document.getElementById("admin-panel")!;
+                            panel.className = "result"
+                            panel.innerHTML = `<p class="result-text">${text}</p>`
+                        })
+                    }
+                })
+            })
+        }  
+    })
+}
 }
 
 let tags = document.getElementById("tags")!;
