@@ -1,9 +1,6 @@
 import express from 'express';
 import fileUpload from 'express-fileupload'
-import {allPostSummaries, getPost, postsWithTag, getTagName,
-   allTags, createTag, deleteTag, renameTag,
-  createPost, deletePost, updatePostTitle,
-  updatePostSummary, addTagToPost,removeTagFromPost, updatePostContent} from './db';
+import * as db from './db';
 
 let app = express();
 const port = 3000;
@@ -15,24 +12,24 @@ app.use(express.urlencoded({extended: true}))
 app.use(fileUpload())
 
 app.get('/', (req, res) => {
-    let posts = allPostSummaries();
+    let posts = db.allPostSummaries();
     res.render('pages/index',{posts});
 })
 app.get('/post/:id', (req,res)=>{
-  let post = getPost(Number(req.params.id))
+  let post = db.getPost(Number(req.params.id))
   res.render('pages/post',{post})
 })
 app.get("/tag/:id", (req,res)=>{
   let id = req.params.id;
 
   if (id == 'all'){
-    let tags = allTags();
+    let tags = db.allTags();
     res.render('pages/alltags',{tags})
   }
   else {
     let tagId = Number(id)
-    let tag = getTagName(tagId)
-    let posts = postsWithTag(tagId);
+    let tag = db.getTagName(tagId)
+    let posts = db.postsWithTag(tagId);
     res.render('pages/tag',{posts,tag})
   }
 })
@@ -40,14 +37,14 @@ app.get("/tag/:id", (req,res)=>{
 app.get("/v/tag/:id", (req,res)=>{
   let id = req.params.id;
   if (id == 'all'){
-    let tags = allTags();
+    let tags = db.allTags();
     res.send(tags);
     
   }
   else {
     let tagId = Number(id)
-    let tag = getTagName(tagId)
-    let posts = postsWithTag(tagId);
+    let tag = db.getTagName(tagId)
+    let posts = db.postsWithTag(tagId);
     res.send({posts,tag})
   }
 })
@@ -55,36 +52,36 @@ app.get("/v/tag/:id", (req,res)=>{
 app.put("/v/tag/:id", (req,res) =>{
   let id = Number(req.params.id)
   let newName = req.body.newName;
-  renameTag(id, newName)
+  db.renameTag(id, newName)
   res.send(`renamed tagId ${id} as ${newName}`)
 })
 
 app.post("/v/tag/:id",(req,res)=>{
   let parentId = Number(req.params.id);
   let name = req.body.newName;
-  createTag({name, parentId})
+  db.createTag({name, parentId})
   res.send(`new tag:  ${name}   is added`);
 
 })
 
 app.delete("/v/tag/:id",(req,res) => {
   let tagId = req.params.id;
-  deleteTag(Number(tagId));
+  db.deleteTag(Number(tagId));
   res.send(`tagId:${tagId} is deleted`);
 })
 
 app.get("/v/post/:id", (req,res)=>{
   let id = req.params.id;
   if(id == "all"){
-    res.send(allPostSummaries());
+    res.send(db.allPostSummaries());
   } else {
-    res.send(getPost(Number(id)));
+    res.send(db.getPost(Number(id)));
   }
 })
 
 app.delete("/v/post/:id", (req,res)=>{
   let id = req.params.id;
-  deletePost(Number(id));
+  db.deletePost(Number(id));
   res.send(`post id ${id} is deleted`)
 })
 
@@ -97,7 +94,7 @@ app.post("/v/post", (req,res)=>{
   let content = buff.data.toString();
 
   try{
-    createPost({title,summary,content,tags:tagArray})
+    db.createPost({title,summary,content,tags:tagArray})
   }
 
   catch (e){
@@ -114,24 +111,24 @@ app.put("/v/post/:id", (req,res)=>{
   let command = req.body.command;
   if (command == "change-title"){
     let newTitle = req.body.newTitle;
-    updatePostTitle(postId, newTitle);
+    db.updatePostTitle(postId, newTitle);
     res.send(`post ${postId} title is updated`)
   } else if (command == "change-summary"){
     let newSummary = req.body.newSummary;
-    updatePostSummary(postId,newSummary);
+    db.updatePostSummary(postId,newSummary);
     res.send(`post ${postId} summary is updated`)
   } else if (command == "tag-add") {
     let newTagId = Number(req.body.newTags);
-    addTagToPost(postId, newTagId);
+    db.addTagToPost(postId, newTagId);
     res.send(`post ${postId} tag is added`)
   } else if (command == "tag-remove") {
     let tagId = Number(req.body.newTags);
-    removeTagFromPost(postId,tagId);
+    db.removeTagFromPost(postId,tagId);
     res.send(`post ${postId} tag is removed`)
   } else if (command == "change-content") {
     let newFile = req.files?.newFile! as any;
     let newContent = newFile.data.toString();
-    updatePostContent(postId,newContent);
+    db.updatePostContent(postId,newContent);
     res.send(`post ${postId} content is updated`)
   }
   
